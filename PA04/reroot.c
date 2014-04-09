@@ -20,6 +20,12 @@ typedef struct stack{
 
 
 #include <stdio.h>
+void preOrderPrint(Tree * root);
+Tree *treebuild(char *Filename);
+int stackEmpty(Stack *top);
+Tree *treeCreate(double width, double height);
+void stackPush(Stack *top, Tree *node);
+Tree *stackPop(Stack *top);
 
 int main(int argc, char * argv[])
 {
@@ -31,13 +37,26 @@ int main(int argc, char * argv[])
     char *output_file = argv[2];
     
     Tree *root = treeBuild(input_file);
-    
+    preOrderPrint(root);
     return 0;
 }
 
+void preOrderPrint(Tree * root)
+{
+    if(root == NULL)return;
+    if(root -> cutline == 'H' || root -> cutline == 'V')
+        printf("%c",root -> cutline);
+    else
+        printf("(%le,%le)",root -> width, root->height);
+    preOrderPrint(root -> left);
+    preOrderPrint(root -> right);
+
+}
+
+
 Tree *treebuild(char *Filename)
 {
-    FILE *fprt = fopen(Filename,"r");
+    FILE *fptr = fopen(Filename,"r");
     if(fptr == NULL){
         printf("fail to read the input file\n");
         return NULL;
@@ -55,7 +74,7 @@ Tree *treebuild(char *Filename)
                 Tree *node = treeCreate(width,height);
                 stackPush(head, node);
             }
-        }else if(cutline == "V"){
+        }else if(cutline == 'V'){
             if(stackEmpty(head) == 0){
                 Tree *vnode = treeCreate(0,0);
                 vnode -> right = stackPop(head);
@@ -64,7 +83,7 @@ Tree *treebuild(char *Filename)
                 root = vnode;
             }
             //even though it's unlikely the file store V or H before node, but it's better to check
-        }else if(cutline == "H"){
+        }else if(cutline == 'H'){
             if(stackEmpty(head) == 0){
                 Tree *hnode = treeCreate(-1,-1);
                 hnode -> right = stackPop(head);
@@ -86,7 +105,7 @@ int stackEmpty(Stack *top)
 
 Tree *treeCreate(double width, double height)
 {
-    tree *root = malloc(sizeof(tree));
+    Tree *root = malloc(sizeof(Tree));
     if(root == NULL)
         printf("malloc failure when malloc tree node\n");
     else{
@@ -95,11 +114,11 @@ Tree *treeCreate(double width, double height)
         root -> left = NULL;
         root -> right = NULL;
         if(width == 0 && height == 0)
-            root -> cutline = "V";
+            root -> cutline = 'V';
         else if(width == -1 && height == -1)
-            root -> cutline = "H";
-        else if
-            root -> cutline = "-";
+            root -> cutline = 'H';
+        else
+            root -> cutline = '-';
     }
     return root;
 }
