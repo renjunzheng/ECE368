@@ -11,6 +11,9 @@ typedef struct tree{
   char cutline;
   struct tree * left;
   struct tree * right;
+    struct tree * parent;
+    double xcoord;
+    double ycoord;
 }Tree;
 
 typedef struct stack{
@@ -27,6 +30,8 @@ Stack *stackPush(Stack *top, Tree *node);
 Stack *stackPop(Stack *top);
 void postOrderPrint(Tree *root);
 void treeWidthHeight(Tree *root);
+void inOrderPrint(Tree *root);
+void treeCoordinate(Tree *root, int num);
 
 int main(int argc, char * argv[])
 {
@@ -39,11 +44,22 @@ int main(int argc, char * argv[])
     
   Tree *root = treeBuild(input_file);
   treeWidthHeight(root);
+    printf("Preorder:");
   preOrderPrint(root);
+    printf("\n\nInorder:");
+    inOrderPrint(root);
+    printf("\n\nPostorder:");
   postOrderPrint(root);
+    printf("\n\nWidth:%le\nHeight:%le\n\n",root -> width, root -> height);
+    treeCoordinate(root, -1);
+    //find the left most
+    Tree *leftmost = root;
+    while(leftmost -> left != NULL)
+        leftmost = leftmost -> left;
+    printf("X-coordinate:  %le\nY-coordinate:  %le\n",leftmost -> xcoord, leftmost -> ycoord);
+    
   return 0;
 }
-
 
 //recursively calculate the tree width, height
 void treeWidthHeight(Tree *root)
@@ -113,8 +129,10 @@ Tree *treeBuild(char *Filename)
       Tree *vnode = malloc(sizeof(Tree));
       vnode -> cutline = 'V';
       vnode -> right = head -> node;
+        vnode -> right -> parent = vnode;
       head = stackPop(head);
       vnode -> left = head -> node;
+        vnode -> left -> parent = vnode;
       head = stackPop(head);
       head = stackPush(head, vnode);
       //even though it's unlikely the file store V or H before node, but it's better to check
@@ -122,8 +140,10 @@ Tree *treeBuild(char *Filename)
       Tree *hnode = malloc(sizeof(Tree));
       hnode -> cutline = 'H';
       hnode -> right = head -> node;
+        hnode -> right -> parent = hnode;
       head = stackPop(head);
       hnode -> left = head -> node;
+        hnode -> left -> parent = hnode;
       head = stackPop(head);
       head = stackPush(head, hnode);
     }
@@ -146,6 +166,9 @@ Tree *treeCreate(double width, double height)
     root -> left = NULL;
     root -> right = NULL;
     root -> cutline = '-';
+      root -> parent = NULL;
+      root -> xcoord = 0;
+      root -> ycoord = 0;
   }
   return root;
 }
@@ -172,4 +195,40 @@ Stack *stackPop(Stack *top)
     free(top);
     return head;
   }
+}
+
+void inOrderPrint(Tree * root)
+{
+    if(root == NULL)
+        return;
+    inOrderPrint(root -> left);
+    if(root -> cutline == 'H' || root -> cutline == 'V')
+        printf("%c",root -> cutline);
+    else
+        printf("(%le,%le)",root -> width, root->height);
+    inOrderPrint(root -> right);
+}
+
+void treeCoordinate(Tree *root, int num)
+{
+    if(root == NULL)return;
+    if(num == 1){
+        if(root -> parent -> cutline == 'H'){
+            root -> xcoord = root -> parent -> xcoord;
+            root -> ycoord = root -> parent -> ycoord + root -> parent -> right -> height;
+        }else if(root -> parent -> cutline == 'V'){
+            root -> ycoord = root -> parent -> ycoord;
+            root -> xcoord = root -> parent -> xcoord;
+        }
+    }else if(num == 0){
+        if(root -> parent -> cutline == 'H'){
+            root -> xcoord = root -> parent -> xcoord;
+            root -> ycoord = root -> parent -> ycoord;
+        }else if(root -> parent -> cutline == 'V'){
+            root -> ycoord = root -> parent -> ycoord;
+            root -> xcoord = root -> parent -> xcoord + root -> parent -> left -> width;
+        }
+    }
+    treeCoordinate(root -> left, 1);
+    treeCoordinate(root -> right, 0);
 }
