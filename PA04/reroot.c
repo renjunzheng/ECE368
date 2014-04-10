@@ -33,6 +33,8 @@ void treeWidthHeight(Tree *root);
 void inOrderPrint(Tree *root);
 void treeCoordinate(Tree *root, int num);
 void outputPrint(FILE *fptr, Tree *root);
+void treeReroot(Tree *root, int num, int index, double *bestwidth, double *bestheight);
+
 
 int main(int argc, char * argv[])
 {
@@ -61,6 +63,11 @@ int main(int argc, char * argv[])
     FILE *fptr2 = fopen(output_file, "w");
     outputPrint(fptr2, root);
     fclose(fptr2);
+    
+    double bestwidth = root -> width;
+    double bestheight = root -> height;
+    treeReroot(root, -1, -1, &bestwidth, &bestheight);
+    printf("\n\n\n\nbest%le\n\n%le\n\n\n", bestwidth, bestheight);
   return 0;
 }
 
@@ -248,104 +255,91 @@ void treeCoordinate(Tree *root, int num)
 }
 
 
-void treeReroot(Tree *root, int num, double bestwidth, double bestheight, int index)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void treeReroot(Tree *root, int num, int index, double *bestwidth, double *bestheight)
 {
     if(root == NULL)return;
-    double widthtemp;
-    double heighttemp;
-    if(num == 1 && index == 1){
-        if(root -> cutline == 'H' && root -> parent -> cutline == 'H'){
-            if((root -> right -> width) > (root -> parent -> right -> width))
-                widthtemp = root -> right -> width;
-            else
-                widthtemp = root -> parent -> right -> width;
-            if(widthtemp > root -> left -> width)
-                root -> width = widthtemp;
-            else
-                root -> width = root -> left -> width;
-            root -> height = root -> right -> height + root -> parent -> right -> height + root -> left -> height;
-            //after calculate this rotation, update the bestwidth and bestheight
-            if((root -> height * root -> width < bestwidth * bestheight) || ((root -> height * root -> width = bestwidth * bestheight)&&(root -> width < bestwidth))){
-                bestwidth = root -> width;
-                bestheight = root -> height;
+    double widthtemp = 0;
+    double heighttemp = 0;
+    if(num == -1){
+        treeReroot(root -> left, 1, -1, bestwidth, bestheight);
+        treeReroot(root -> right, 0, -1, bestwidth, bestheight);
+    }else{
+        if(index == -1){
+            treeReroot(root -> left, num, 1, bestwidth,bestheight);
+            treeReroot(root -> right, num , 0, bestwidth, bestheight);
+        }
+        if(num == 1 && index == 1){
+            if(root -> parent == 'H' && root -> parent -> parent == 'H'){
+                
+            }else if(root -> parent == 'H' && root -> parent -> parent == 'V'){
+                
+            }else if(root -> parent == 'V' && root -> parent -> parent == 'H'){
+               
+            }else if(root -> parent == 'V' && root -> parent -> parent == 'V'){
+                
             }
-        }else if(root -> cutline == 'V' && root -> parent -> cutline == 'H'){
-            if((root -> right -> width) > (root -> parent -> right -> width))
-                widthtemp = root -> right -> width;
-            else
-                widthtemp = root -> parent -> right -> width;
-            root -> width = root -> left -> width + widthtemp;
-            heighttemp = root -> right -> height + root -> parent -> right -> height;
-            if(root -> left -> height > heighttemp)
-                root -> height = root -> left -> height;
-            else
-                root -> height = heighttemp;
-            if((root -> height * root -> width < bestwidth * bestheight) || ((root -> height * root -> width = bestwidth * bestheight)&&(root -> width < bestwidth))){
-                bestwidth = root -> width;
-                bestheight = root -> height;
+            if((root -> parent -> width * root -> parent -> height < bestheight * bestwidth) || ((root -> parent -> width * root -> parent -> height == bestheight * bestwidth)&&(root -> parent -> width < bestwidth))){
+                bestwidth = root -> parent ->width;
+                bestheight = root -> parent -> height;
             }
-        }else if(root -> cutline == 'H' && root -> parent -> cutline == 'V'){
-            if(root -> right -> height > root -> parent -> right -> height)
-                heighttemp = root -> right -> height;
-            else
-                heighttemp = root -> parent -> right -> height;
-            root -> height = heighttemp + root -> left -> height;
-            widthtemp = root -> right -> width + root -> parent -> right -> width;
-            if(widthtemp > root -> left -> width)
-                root -> widht = widthtemp;
-            else
-                root -> width = root -> left -> width;
-            if((root -> height * root -> width < bestwidth * bestheight) || ((root -> height * root -> width = bestwidth * bestheight)&&(root -> width < bestwidth))){
-                bestwidth = root -> width;
-                bestheight = root -> height;
+        }else if(num == 1 && index == 0){
+            if(root -> parent == 'H' && root -> parent -> parent == 'H'){
+                
+            }else if(root -> parent == 'H' && root -> parent -> parent == 'V'){
+                
+            }else if(root -> parent == 'V' && root -> parent -> parent == 'H'){
+                
+            }else if(root -> parent == 'V' && root -> parent -> parent == 'V'){
+                
             }
-        }else if(root -> cutline == 'V' && root -> parent -> cutline == 'V'){
-            root -> width = root -> left -> width + root -> right -> width + root -> parent ->right -> width;
-            if(root -> right -> height > root -> parent -> right -> height)
-                heighttemp = root -> right -> height;
-            else
-                heighttemp = root -> parent -> right -> height;
-            if(heighttemp > root -> left -> height)
-                root -> height = heighttemp;
-            else
-                root -> height = root -> left -> height;
-            if((root -> height * root -> width < bestwidth * bestheight) || ((root -> height * root -> width = bestwidth * bestheight)&&(root -> width < bestwidth))){
-                bestwidth = root -> width;
-                bestheight = root -> height;
+            if((root -> parent -> width * root -> parent -> height < bestheight * bestwidth) || ((root -> parent -> width * root -> parent -> height == bestheight * bestwidth)&&(root -> parent -> width < bestwidth))){
+                bestwidth = root -> parent ->width;
+                bestheight = root -> parent -> height;
+            }
+        }else if(num == 0 && index == 1){
+            if(root -> parent == 'H' && root -> parent -> parent == 'H'){
+                
+            }else if(root -> parent == 'H' && root -> parent -> parent == 'V'){
+                
+            }else if(root -> parent == 'V' && root -> parent -> parent == 'H'){
+                
+            }else if(root -> parent == 'V' && root -> parent -> parent == 'V'){
+                
+            }
+            if((root -> parent -> width * root -> parent -> height < bestheight * bestwidth) || ((root -> parent -> width * root -> parent -> height == bestheight * bestwidth)&&(root -> parent -> width < bestwidth))){
+                bestwidth = root -> parent ->width;
+                bestheight = root -> parent -> height;
+            }
+        }else if(num == 0 && index == 0){
+            if(root -> parent == 'H' && root -> parent -> parent == 'H'){
+                
+            }else if(root -> parent == 'H' && root -> parent -> parent == 'V'){
+                
+            }else if(root -> parent == 'V' && root -> parent -> parent == 'H'){
+                
+            }else if(root -> parent == 'V' && root -> parent -> parent == 'V'){
+                
+            }
+            if((root -> parent -> width * root -> parent -> height < bestheight * bestwidth) || ((root -> parent -> width * root -> parent -> height == bestheight * bestwidth)&&(root -> parent -> width < bestwidth))){
+                bestwidth = root -> parent ->width;
+                bestheight = root -> parent -> height;
             }
         }
+        treeReroot(root -> left, num, 1, bestwidth,bestheight);
+        treeReroot(root -> right, num , 0, bestwidth, bestheight);
     }
-    
-        
-        
-        
-        
-        
-        
-        
-        if(root -> cutline == 'H'){
-            if(root -> left -> width > root -> right -> width)
-                root -> width = root -> left -> width;
-            else
-                root -> width = root -> right -> width;
-            root -> height = root -> left -> height + root -> right -> height;
-        }else if(root -> cutline == 'V'){
-            if(root -> left -> height > root -> right -> height)
-                root -> height = root -> left -> height ;
-            else
-                root -> height = root -> right -> height;
-            root -> width = root -> left -> width + root -> right -> width;
-        }
-        
-        
-        
-        
-        
-        
-        root -> height
-    }else if(num == 0){
-        
-    }
-    treeReroot(root -> left, 1);
-    treeReroot(root -> right ,0);
 }
