@@ -5,36 +5,9 @@
 //  Created by Renjun Zheng on 3/29/14.
 //  Copyright (c) 2014 Renjun Zheng. All rights reserved.
 //
-typedef struct tree{
-  double width;
-  double height;
-  char cutline;
-  struct tree * left;
-  struct tree * right;
-    struct tree * parent;
-    double xcoord;
-    double ycoord;
-}Tree;
-
-typedef struct stack{
-  struct tree * node;
-  struct stack * next;
-}Stack;
-
 #include <stdlib.h>
 #include <stdio.h>
-void preOrderPrint(Tree * root);
-Tree *treeBuild(char *Filename);
-Tree *treeCreate(double width, double height);
-Stack *stackPush(Stack *top, Tree *node);
-Stack *stackPop(Stack *top);
-void postOrderPrint(Tree *root);
-void treeWidthHeight(Tree *root);
-void inOrderPrint(Tree *root);
-void treeCoordinate(Tree *root, int num);
-void outputPrint(FILE *fptr, Tree *root);
-void treeReroot(Tree *root, int num, int index, double *bestwidth, double *bestheight);
-
+#include "reroot.h"
 
 int main(int argc, char * argv[])
 {
@@ -64,10 +37,18 @@ int main(int argc, char * argv[])
     outputPrint(fptr2, root);
     fclose(fptr2);
     
-    double bestwidth = root -> width;
-    double bestheight = root -> height;
-    treeReroot(root, -1, -1, &bestwidth, &bestheight);
-    printf("\n\n\n\nbest%le\n\n%le\n\n\n", bestwidth, bestheight);
+    Info *info = malloc(sizeof(Info));
+    info -> leftwidth = root ->left -> width;
+    info -> leftheight = root -> left -> height;
+    info -> bestwidth = root -> width;
+    info -> bestheight = root -> height;
+    info -> num = -1;
+    info -> index = -1;
+    info -> cutline = '-';
+    info -> rightwidth = root -> right -> width;
+    info -> rightheight = root -> right -> height;
+    treeReroot(root, info);
+    printf("\n\n\n\nbest%le\n\n%le\n\n\n", info -> bestwidth, info -> bestheight);
   return 0;
 }
 
@@ -254,92 +235,177 @@ void treeCoordinate(Tree *root, int num)
     treeCoordinate(root -> right, 0);
 }
 
+double bigger(double a, double b){
+    if(a > b)
+        return a;
+    else
+        return b;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void treeReroot(Tree *root, int num, int index, double *bestwidth, double *bestheight)
+void treeReroot(Tree *root, Info *info)
 {
     if(root == NULL)return;
     double widthtemp = 0;
     double heighttemp = 0;
-    if(num == -1){
-        treeReroot(root -> left, 1, -1, bestwidth, bestheight);
-        treeReroot(root -> right, 0, -1, bestwidth, bestheight);
+    if(info -> num == -1){
+        info -> num = 1;
+        treeReroot(root -> left, info);
+        info -> num = 0;
+        treeReroot(root -> right, info);
     }else{
-        if(index == -1){
-            treeReroot(root -> left, num, 1, bestwidth,bestheight);
-            treeReroot(root -> right, num , 0, bestwidth, bestheight);
+        if(info -> index == -1){
+            info -> index = 1;
+            info -> cutline = root -> parent -> cutline;
+            treeReroot(root -> left, info);
+            info -> index = 0;
+            info -> cutline = root -> parent -> cutline;
+            treeReroot(root -> right, info);
         }
-        if(num == 1 && index == 1){
-            if(root -> parent == 'H' && root -> parent -> parent == 'H'){
+        if(info -> num == 1 && info -> index == 1){
+            if(root -> parent -> cutline == 'H' && info -> cutline == 'H'){
+                info -> rightwidth = bigger(root -> parent -> right -> width ,info -> rightwidth);
+                info -> rightheight += root -> parent -> right -> height;
+                widthtemp = bigger(info -> rightwidth, root -> width);
+                heighttemp = root -> height + info -> rightheight;
                 
-            }else if(root -> parent == 'H' && root -> parent -> parent == 'V'){
                 
-            }else if(root -> parent == 'V' && root -> parent -> parent == 'H'){
-               
-            }else if(root -> parent == 'V' && root -> parent -> parent == 'V'){
+                //confirm
+            }else if(root -> parent -> cutline == 'H' && info -> cutline == 'V'){
+                info -> rightwidth += root -> parent -> right -> width;
+                info -> rightheight = bigger(root -> parent -> right -> width, info -> rightwidth);
+                heighttemp = info -> rightheight + root -> height;
+                widthtemp = bigger(info -> rightwidth, root -> width);
                 
+                //confirm
+            }else if(root -> parent -> cutline == 'V' && info -> cutline == 'H'){
+                info -> rightwidth = bigger(root -> parent -> right -> width, info -> rightwidth);
+                info -> rightheight += root -> parent -> right -> height;
+                heighttemp = bigger(root -> height, info -> rightheight);
+                widthtemp = info -> rightwidth + root -> width;
+                
+                //confirm
+            }else if(root -> parent -> cutline == 'V' && info -> cutline == 'V'){
+                info -> rightheight = bigger(root -> parent -> right -> height, info -> rightheight);
+                info -> rightwidth += root -> parent -> right -> width;
+                widthtemp = root -> width + info -> rightwidth;
+                heighttemp = bigger(root -> height, info -> rightheight);
+                
+                //confirm
             }
-            if((root -> parent -> width * root -> parent -> height < bestheight * bestwidth) || ((root -> parent -> width * root -> parent -> height == bestheight * bestwidth)&&(root -> parent -> width < bestwidth))){
-                bestwidth = root -> parent ->width;
-                bestheight = root -> parent -> height;
+            if((widthtemp * heighttemp < info -> bestheight * info -> bestwidth) || ((widthtemp * heighttemp == info -> bestheight * info -> bestwidth)&&(widthtemp < info -> bestwidth))){
+                info -> bestwidth = widthtemp;
+                info -> bestheight = heighttemp;
             }
-        }else if(num == 1 && index == 0){
-            if(root -> parent == 'H' && root -> parent -> parent == 'H'){
+        }else if(info -> num == 1 && info -> index == 0){
+            if(root -> parent -> cutline == 'H' && info -> cutline  == 'H'){
+                info -> leftwidth = bigger(root -> parent -> left -> width, info -> leftwidth);
+                info -> leftheight += root -> parent -> left -> height;
+                widthtemp = bigger(root -> width, info -> leftwidth);
+                heighttemp = info -> leftheight + root -> height;
                 
-            }else if(root -> parent == 'H' && root -> parent -> parent == 'V'){
                 
-            }else if(root -> parent == 'V' && root -> parent -> parent == 'H'){
+               //confirm
+            }else if(root -> parent -> cutline == 'H' && info -> cutline  == 'V'){
+                info -> leftheight = bigger(root -> parent -> left -> height, info -> leftheight);
+                info -> leftwidth += root -> parent -> left -> width;
+                widthtemp = bigger(root -> width, info -> leftwidth);
+                heighttemp = info -> leftheight + root -> height;
                 
-            }else if(root -> parent == 'V' && root -> parent -> parent == 'V'){
+                //confirm
+            }else if(root -> parent -> cutline == 'V' && info -> cutline  == 'H'){
+                info -> leftwidth = bigger(root -> parent -> left -> width, info -> leftwidth);
+                info -> leftheight += root -> parent -> left -> height;
+                widthtemp = root -> width + info -> leftwidth;
+                heighttemp = bigger(root -> height, info -> leftheight);
                 
+                //confirm
+            }else if(root -> parent -> cutline == 'V' && info -> cutline == 'V'){
+                info -> leftheight = bigger(root -> parent -> left -> height, info -> leftheight);
+                info -> leftwidth += root -> parent -> left -> width;
+                widthtemp = root -> width + info -> leftwidth;
+                heighttemp = bigger(root -> height, info -> leftheight);
+                
+                //confirm
             }
-            if((root -> parent -> width * root -> parent -> height < bestheight * bestwidth) || ((root -> parent -> width * root -> parent -> height == bestheight * bestwidth)&&(root -> parent -> width < bestwidth))){
-                bestwidth = root -> parent ->width;
-                bestheight = root -> parent -> height;
+            if((widthtemp * heighttemp < info -> bestheight * info -> bestwidth) || ((widthtemp * heighttemp == info -> bestheight * info -> bestwidth)&&(widthtemp < info -> bestwidth))){
+                info -> bestwidth = widthtemp;
+                info -> bestheight = heighttemp;
             }
-        }else if(num == 0 && index == 1){
-            if(root -> parent == 'H' && root -> parent -> parent == 'H'){
+        }else if(info -> num == 0 && info -> index == 1){
+            if(root -> parent -> cutline == 'H' && info -> cutline  == 'H'){
+                info -> rightwidth = bigger(root -> parent -> right -> width ,info -> rightwidth);
+                info -> rightheight += root -> parent -> right -> height;
+                widthtemp = bigger(root -> width, info -> rightwidth);
+                heighttemp = info -> rightheight + root -> height;
+
+                //confirm
+            }else if(root -> parent -> cutline == 'H' && info -> cutline  == 'V'){
+                info -> rightheight = bigger(root -> parent -> right -> height, info -> rightheight);
+                info -> rightwidth += root -> parent -> left -> width;
+                widthtemp = bigger(root -> width, info -> rightwidth);
+                heighttemp = info -> rightheight + root -> height;
                 
-            }else if(root -> parent == 'H' && root -> parent -> parent == 'V'){
                 
-            }else if(root -> parent == 'V' && root -> parent -> parent == 'H'){
+                //confirm
+            }else if(root -> parent -> cutline == 'V' && info -> cutline  == 'H'){
+                info -> rightwidth = bigger(root -> parent -> right -> width ,info -> rightwidth);
+                info -> rightheight += root -> parent -> right -> height;
+                widthtemp = root -> width + info -> rightwidth;
+                heighttemp = bigger(root -> height, info -> rightheight);
                 
-            }else if(root -> parent == 'V' && root -> parent -> parent == 'V'){
+                //confirm
+            }else if(root -> parent -> cutline == 'V' && info -> cutline  == 'V'){
+                info -> rightheight = bigger(root -> parent -> right -> height, info -> rightheight);
+                info -> rightwidth += root -> parent -> left -> width;
+                widthtemp = root -> width + info -> rightwidth;
+                heighttemp = bigger(root -> height, info -> rightheight);
                 
+                //confirm
             }
-            if((root -> parent -> width * root -> parent -> height < bestheight * bestwidth) || ((root -> parent -> width * root -> parent -> height == bestheight * bestwidth)&&(root -> parent -> width < bestwidth))){
-                bestwidth = root -> parent ->width;
-                bestheight = root -> parent -> height;
+            if((widthtemp * heighttemp < info -> bestheight * info -> bestwidth) || ((widthtemp * heighttemp == info -> bestheight * info -> bestwidth)&&(widthtemp < info -> bestwidth))){
+                info -> bestwidth = widthtemp;
+                info -> bestheight = heighttemp;
             }
-        }else if(num == 0 && index == 0){
-            if(root -> parent == 'H' && root -> parent -> parent == 'H'){
+        }else if(info -> num == 0 && info -> index == 0){
+            if(root -> parent -> cutline == 'H' && info -> cutline  == 'H'){
+                info -> leftwidth = bigger(root -> parent -> left -> width, info -> leftwidth);
+                info -> leftheight += root -> parent -> left -> height;
+                heighttemp = root -> height + info -> leftheight;
+                widthtemp = bigger(root -> width, info -> leftwidth);
                 
-            }else if(root -> parent == 'H' && root -> parent -> parent == 'V'){
+                //comfirm
+            }else if(root -> parent -> cutline == 'H' && info -> cutline  == 'V'){
+                info -> leftheight = bigger(root -> parent -> left -> height, info -> leftheight);
+                info -> leftwidth += root -> parent -> left -> width;
+                heighttemp = root -> height + info -> leftheight;
+                widthtemp = bigger(root -> width, info -> leftwidth);
                 
-            }else if(root -> parent == 'V' && root -> parent -> parent == 'H'){
+                //confirm
+            }else if(root -> parent -> cutline == 'V' && info -> cutline  == 'H'){
+                info -> leftwidth = bigger(root -> parent -> left -> width, info -> leftwidth);
+                info -> leftheight += root -> parent -> left -> height;
+                widthtemp = root -> width + info -> leftwidth;
+                heighttemp = bigger(root -> height, info -> leftheight);
                 
-            }else if(root -> parent == 'V' && root -> parent -> parent == 'V'){
-                
+                //confirm
+            }else if(root -> parent -> cutline == 'V' && info -> cutline  == 'V'){
+                info -> leftheight = bigger(root -> parent -> left -> height, info -> leftheight);
+                info -> leftwidth += root -> parent -> left -> width;
+                widthtemp = root -> width + info -> leftwidth;
+                heighttemp = bigger(root -> height, info -> leftheight);
+
+                //confirm
             }
-            if((root -> parent -> width * root -> parent -> height < bestheight * bestwidth) || ((root -> parent -> width * root -> parent -> height == bestheight * bestwidth)&&(root -> parent -> width < bestwidth))){
-                bestwidth = root -> parent ->width;
-                bestheight = root -> parent -> height;
+            if((widthtemp * heighttemp < info -> bestheight * info -> bestwidth) || ((widthtemp * heighttemp == info -> bestheight * info -> bestwidth)&&(widthtemp < info -> bestwidth))){
+                info -> bestwidth = widthtemp;
+                info -> bestheight = heighttemp;
             }
         }
-        treeReroot(root -> left, num, 1, bestwidth,bestheight);
-        treeReroot(root -> right, num , 0, bestwidth, bestheight);
+        info -> cutline = root -> parent -> cutline;
+        info -> num = info -> index;
+        info -> index = 1;
+        treeReroot(root -> left, info);
+        info -> index = 0;
+        treeReroot(root -> right, info);
     }
 }
