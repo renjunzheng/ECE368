@@ -5,8 +5,8 @@
 //  Created by Renjun Zheng on 3/29/14.
 //  Copyright (c) 2014 Renjun Zheng. All rights reserved.
 //
-#ifndef hw03_h
-#define hw03_h
+#ifndef hw04_h
+#define hw04_h
 
 typedef struct tree{
     double width;
@@ -25,16 +25,13 @@ typedef struct stack{
 }Stack;
 
 typedef struct info{
-    double leftwidth;//imaginary grandparent width
-    double leftheight;//imaginary grandparent height
-    double rightwidth;
-    double rightheight;
     char cutline;//imaginary grandparent cutline
     double bestheight;
     double bestwidth;
     double size;
-    int num;
+    int number;
     int index;
+    int value;
 }Info;
 
 void preOrderPrint(Tree * root);
@@ -47,6 +44,6 @@ void treeWidthHeight(Tree *root);
 void inOrderPrint(Tree *root);
 void treeCoordinate(Tree *root, int num);
 void outputPrint(FILE *fptr, Tree *root);
-void treeReroot(Tree *root, Info *info);
+void treeReroot(Tree * root, int value, char cutline, Info *info, double leftwidth, double leftheight, double rightwidth, double rightheight);
 
 #endif
