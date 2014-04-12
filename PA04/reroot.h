@@ -25,13 +25,10 @@ typedef struct stack{
 }Stack;
 
 typedef struct info{
-    char cutline;//imaginary grandparent cutline
     double bestheight;
     double bestwidth;
-    double size;
     int number;
     int index;
-    int value;
 }Info;
 
 void preOrderPrint(Tree * root);
@@ -45,5 +42,9 @@ void inOrderPrint(Tree *root);
 void treeCoordinate(Tree *root, int num);
 void outputPrint(FILE *fptr, Tree *root);
 void treeReroot(Tree * root, int value, char cutline, Info *info, double leftwidth, double leftheight, double rightwidth, double rightheight);
+void treeFree(Tree * root);
+void treePrint(Tree *root);
+void outputFileSave(char *output_file, Tree *root);
+void treeRerootMain(Tree *root);
 
 #endif
