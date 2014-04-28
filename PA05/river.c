@@ -5,7 +5,6 @@
 //  Created by Renjun Zheng on 4/18/14.
 //  Copyright (c) 2014 Renjun Zheng. All rights reserved.
 //
-#define EOF (-1)
 #include <stdio.h>
 #include "river.h"
 #include <stdlib.h>
@@ -48,6 +47,7 @@ int main(int argc, char * argv[])
     Vertex * head = buildVertex(row, column, poles, &index);
     Vertex * temp = head;
     //successfully build the list, already tested
+
     Bridge * bTemp = NULL;
     temp = head;
     for(lc1 = 0; lc1 < index; lc1++){
@@ -60,7 +60,54 @@ int main(int argc, char * argv[])
         }
         temp = temp -> next;
     }
+    
     //successfully build the adjacency list, already tested
+    
+    temp = head;
+    for(lc1 = 0; lc1 < index; lc1++){
+        bTemp = temp -> node;
+        bTemp -> turns = 1000;
+        temp = temp -> next;
+    }
+    temp = head;
+    temp -> node -> turns = 0;
+    temp = head;
+    for(lc1 = 0; lc1 < index; lc1++){
+        bTemp = temp -> node;
+        for(lc2 = 0; lc2 < index; lc2 ++){
+            printf("%d ", bTemp -> turns);
+            //if(bTemp -> next != NULL)
+            bTemp = bTemp -> next;
+        }
+        printf("\n");
+        temp = temp -> next;
+    }
+
+    //Bellman-Ford
+    Vertex *secTemp = head;
+    int lc3 = 0;
+    temp = head -> next;
+    Bridge *briTemp = NULL;
+    for(lc1 = 1; lc1 < index; lc1++){
+        briTemp = temp -> node -> next;
+        if(index == 2){
+            if(temp -> node -> turns > (briTemp -> turns + secTemp -> node -> turns)){
+                temp -> node -> turns = (briTemp -> turns + secTemp -> node -> turns);
+            }
+        }else{
+        for(lc2 = 0; lc2 < index - 2; lc2++){
+            secTemp = head;
+            for(lc3 = 0; lc3 < briTemp -> index; lc3 ++){
+                secTemp = secTemp -> next;
+            }
+            if(temp -> node -> turns > (briTemp -> turns + secTemp -> node -> turns)){
+                temp -> node -> turns = (briTemp -> turns + secTemp -> node -> turns);
+            }
+            briTemp = briTemp -> next;
+        }}
+        temp = temp -> next;
+            
+    }
     
     temp = head;
     for(lc1 = 0; lc1 < index; lc1++){
@@ -68,12 +115,13 @@ int main(int argc, char * argv[])
         for(lc2 = 0; lc2 < index; lc2 ++){
             printf("%d ", bTemp -> turns);
             //if(bTemp -> next != NULL)
-                bTemp = bTemp -> next;
+            bTemp = bTemp -> next;
         }
         printf("\n");
         temp = temp -> next;
     }
 
+    
     fclose(fptr);
     return 0;
 }
@@ -249,6 +297,8 @@ Bridge *createBridge(int indexnum, int sourcenum, Vertex *head)
                 node -> turns = 2*difx - 1;
             }
         }else if(source -> yb > bridge -> yt){
+            node -> turns = 2*difx - 1;
+        }else if(bridge -> yb > source -> yt){
             node -> turns = 2*difx - 1;
         }
     }
