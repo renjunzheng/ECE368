@@ -26,8 +26,6 @@ int main(int argc, char * argv[])
     int column = 0;
     fscanf(fptr,"%d", &column);
     int row = column - 1;
-    
-    printf("column number %d\n", column);
     //build a 2 dimensional array to determine how many vertex
     int poles[row][column];
     int lc1 = 0; //loop control
@@ -48,11 +46,34 @@ int main(int argc, char * argv[])
     //successfully read the file, already tested
     int index = 0;
     Vertex * head = buildVertex(row, column, poles, &index);
-    int lc3 = 0;
-    for(lc3 = 0; lc3 < index; lc3++){
-        printf("%d %d %d\n", head -> x, head -> yt, head -> yb);
-        head = head -> next;
+    Vertex * temp = head;
+    //successfully build the list, already tested
+    Bridge * bTemp = NULL;
+    temp = head;
+    for(lc1 = 0; lc1 < index; lc1++){
+        bTemp = temp -> node;
+        for(lc2 = 0; lc2 < index; lc2 ++){
+            Bridge *bridge = createBridge(lc2, lc1, head);
+            bTemp -> next = bridge;
+            if(bTemp -> next != NULL)
+                bTemp = bTemp -> next;
+        }
+        temp = temp -> next;
     }
+    //successfully build the adjacency list, already tested
+    
+    temp = head;
+    for(lc1 = 0; lc1 < index; lc1++){
+        bTemp = temp -> node;
+        for(lc2 = 0; lc2 < index; lc2 ++){
+            printf("%d ", bTemp -> turns);
+            //if(bTemp -> next != NULL)
+                bTemp = bTemp -> next;
+        }
+        printf("\n");
+        temp = temp -> next;
+    }
+
     fclose(fptr);
     return 0;
 }
@@ -70,6 +91,10 @@ Vertex *createVertex(int x, int y, int index)
     head -> yt = y;
     head -> yb = y + 1;
     head -> next = NULL;
+    head -> node = malloc(sizeof(Bridge));
+    head -> node -> index = index;
+    head -> node -> turns = 0;
+    head -> node -> next = NULL;
     return head;
 }
 
@@ -77,11 +102,9 @@ Vertex *buildVertex(int row, int column, int poles[row][column], int *index)
 {
     int lc1 = 0;
     int lc2 = 0;
-    Vertex *head;
-    printf("number of rows %d, number of columns %d\n", row, column);
+    Vertex *head = NULL;
     for(lc2 = 0; lc2 < column; lc2++){
         for(lc1 = 0; lc1 < row; lc1++){
-            printf("row: %d, column: %d \n", lc1, lc2);
             if(lc1 == 0){
                 if(poles[lc1][lc2] == 1){
                     if(*index == 0){
@@ -159,7 +182,78 @@ Vertex *buildVertex(int row, int column, int poles[row][column], int *index)
     return head;
 }
 
-
+Bridge *createBridge(int indexnum, int sourcenum, Vertex *head)
+{
+    if(indexnum == sourcenum)
+        return NULL;
+    Bridge *node = malloc(sizeof(Bridge));
+    node -> index = indexnum;
+    node -> next = NULL;
+    Vertex *temp = head;
+    Vertex *source = NULL;
+    Vertex *bridge = NULL;
+    int dify = 0;
+    int difx = 0;
+    int lc1 = 0;
+    for(lc1 = 0; lc1 < sourcenum; lc1 ++){
+        temp = temp -> next;
+    }
+    source = temp;
+    temp = head;
+    for(lc1 = 0; lc1 < indexnum; lc1 ++){
+        temp = temp -> next;
+    }
+    bridge = temp;
+    
+    if(source -> x == bridge -> x){
+        if(source -> yb < bridge -> yt){
+            node -> turns = 2*(bridge -> yt - source -> yb);
+        }else if(bridge -> yb < source -> yt){
+            node -> turns = 2*(source -> yt - bridge -> yb);
+        }
+    }else if(source -> x < bridge -> x){
+        difx = bridge -> x - source -> x;
+        if(source -> yb < bridge -> yt){
+            dify = bridge -> yt - source -> yb;
+            if(dify >= difx){
+                node -> turns = dify*2;
+            }else{
+                node -> turns = 2*difx - 1;
+            }
+        }else if(bridge -> yb < source -> yt){
+            dify = source -> yt - bridge -> yb;
+            if(dify >= difx){
+                node -> turns = dify*2;
+            }else{
+                node -> turns = 2*difx - 1;
+            }
+        }else if(source -> yb > bridge -> yt){
+            node -> turns = 2*difx - 1;
+        }else if(bridge -> yb > source -> yt){
+            node -> turns = 2*difx - 1;
+        }
+    }else if(source -> x > bridge -> x){
+        difx = source -> x - bridge -> x;
+        if(source -> yb < bridge -> yt){
+            dify = bridge -> yt - source -> yb;
+            if(dify >= difx){
+                node -> turns = dify*2;
+            }else{
+                node -> turns = 2*difx - 1;
+            }
+        }else if(bridge -> yb < source -> yt){
+            dify = source -> yt - bridge -> yb;
+            if(dify >= difx){
+                node -> turns = dify*2;
+            }else{
+                node -> turns = 2*difx - 1;
+            }
+        }else if(source -> yb > bridge -> yt){
+            node -> turns = 2*difx - 1;
+        }
+    }
+    return node;
+}
 
 
 

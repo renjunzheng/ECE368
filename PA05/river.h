@@ -11,6 +11,7 @@
 
 typedef struct _bridge{
     int index;
+    int turns;
     struct _bridge * next;
 }Bridge;
 
@@ -25,3 +26,5 @@ typedef struct _vertex{
 #endif
 
 Vertex *buildVertex(int row, int column, int poles[row][column], int *index);
+Vertex *createVertex(int x, int y, int index);
+Bridge *createBridge(int index, int source, Vertex *head);
