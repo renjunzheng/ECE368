@@ -42,17 +42,38 @@ int main(int argc, char * argv[])
             
         }
     }
+    
     //successfully read the file, already tested
     int index = 0;
     Vertex * head = buildVertex(row, column, poles, &index);
     Vertex * temp = head;
+    
     //successfully build the list, already tested
+
+    
+    //now add the two shore
+    //build start
+    Vertex *start = createVertex(-1, 0, -1);
+    start -> yb = column - 1;
+    start -> next = head;
+    head = start;
+    temp = head;
+    
+    //build end
+    while(temp -> next != NULL){
+        temp = temp -> next;
+    }
+    Vertex *end = createVertex(column, 0, index);
+    end -> yb = column - 1;
+    temp -> next = end;
+
+    int num = index + 2;
 
     Bridge * bTemp = NULL;
     temp = head;
-    for(lc1 = 0; lc1 < index; lc1++){
+    for(lc1 = 0; lc1 < num; lc1++){
         bTemp = temp -> node;
-        for(lc2 = 0; lc2 < index; lc2 ++){
+        for(lc2 = 0; lc2 < num; lc2 ++){
             Bridge *bridge = createBridge(lc2, lc1, head);
             bTemp -> next = bridge;
             if(bTemp -> next != NULL)
@@ -61,10 +82,22 @@ int main(int argc, char * argv[])
         temp = temp -> next;
     }
     
+    temp = head;
+    for(lc1 = 0; lc1 < num; lc1++){
+        bTemp = temp -> node;
+        for(lc2 = 0; lc2 < num; lc2 ++){
+            printf("%d ", bTemp -> turns);
+            bTemp = bTemp -> next;
+        }
+        printf("\n");
+        temp = temp -> next;
+    }
+    
+    
     //successfully build the adjacency list, already tested
     
     temp = head;
-    for(lc1 = 0; lc1 < index; lc1++){
+    for(lc1 = 0; lc1 < num; lc1++){
         bTemp = temp -> node;
         bTemp -> turns = 1000;
         temp = temp -> next;
@@ -72,9 +105,9 @@ int main(int argc, char * argv[])
     temp = head;
     temp -> node -> turns = 0;
     temp = head;
-    for(lc1 = 0; lc1 < index; lc1++){
+    for(lc1 = 0; lc1 < num; lc1++){
         bTemp = temp -> node;
-        for(lc2 = 0; lc2 < index; lc2 ++){
+        for(lc2 = 0; lc2 < num; lc2 ++){
             printf("%d ", bTemp -> turns);
             //if(bTemp -> next != NULL)
             bTemp = bTemp -> next;
@@ -83,19 +116,19 @@ int main(int argc, char * argv[])
         temp = temp -> next;
     }
 
+    printf("index %d\n", index);
+    printf("num %d\n", num);
     //Bellman-Ford
     Vertex *secTemp = head;
     int lc3 = 0;
     temp = head -> next;
     Bridge *briTemp = NULL;
-    for(lc1 = 1; lc1 < index; lc1++){
+    for(lc1 = 1; lc1 < num - 1; lc1++){
         briTemp = temp -> node -> next;
-        if(index == 2){
-            if(temp -> node -> turns > (briTemp -> turns + secTemp -> node -> turns)){
-                temp -> node -> turns = (briTemp -> turns + secTemp -> node -> turns);
-            }
-        }else{
-        for(lc2 = 0; lc2 < index - 2; lc2++){
+        
+
+        
+        for(lc2 = 0; lc2 < num - 2; lc2++){
             secTemp = head;
             for(lc3 = 0; lc3 < briTemp -> index; lc3 ++){
                 secTemp = secTemp -> next;
@@ -104,15 +137,15 @@ int main(int argc, char * argv[])
                 temp -> node -> turns = (briTemp -> turns + secTemp -> node -> turns);
             }
             briTemp = briTemp -> next;
-        }}
+        }
         temp = temp -> next;
             
     }
     
     temp = head;
-    for(lc1 = 0; lc1 < index; lc1++){
+    for(lc1 = 0; lc1 < num; lc1++){
         bTemp = temp -> node;
-        for(lc2 = 0; lc2 < index; lc2 ++){
+        for(lc2 = 0; lc2 < num; lc2 ++){
             printf("%d ", bTemp -> turns);
             //if(bTemp -> next != NULL)
             bTemp = bTemp -> next;
