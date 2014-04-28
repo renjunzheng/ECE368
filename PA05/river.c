@@ -82,16 +82,16 @@ int main(int argc, char * argv[])
         temp = temp -> next;
     }
     
-    temp = head;
-    for(lc1 = 0; lc1 < num; lc1++){
-        bTemp = temp -> node;
-        for(lc2 = 0; lc2 < num; lc2 ++){
-            printf("%d ", bTemp -> turns);
-            bTemp = bTemp -> next;
-        }
-        printf("\n");
-        temp = temp -> next;
-    }
+//    temp = head;
+//    for(lc1 = 0; lc1 < num; lc1++){
+//        bTemp = temp -> node;
+//        for(lc2 = 0; lc2 < num; lc2 ++){
+//            printf("%d ", bTemp -> turns);
+//            bTemp = bTemp -> next;
+//        }
+//        printf("\n");
+//        temp = temp -> next;
+//    }
     
     
     //successfully build the adjacency list, already tested
@@ -104,20 +104,20 @@ int main(int argc, char * argv[])
     }
     temp = head;
     temp -> node -> turns = 0;
-    temp = head;
-    for(lc1 = 0; lc1 < num; lc1++){
-        bTemp = temp -> node;
-        for(lc2 = 0; lc2 < num; lc2 ++){
-            printf("%d ", bTemp -> turns);
-            //if(bTemp -> next != NULL)
-            bTemp = bTemp -> next;
-        }
-        printf("\n");
-        temp = temp -> next;
-    }
+//    temp = head;
+//    for(lc1 = 0; lc1 < num; lc1++){
+//        bTemp = temp -> node;
+//        for(lc2 = 0; lc2 < num; lc2 ++){
+//            printf("%d ", bTemp -> turns);
+//            //if(bTemp -> next != NULL)
+//            bTemp = bTemp -> next;
+//        }
+//        printf("\n");
+//        temp = temp -> next;
+//    }
 
-    printf("index %d\n", index);
-    printf("num %d\n", num);
+//    printf("index %d\n", index);
+//    printf("num %d\n", num);
     //Bellman-Ford
     Vertex *secTemp = head;
     int lc3 = 0;
@@ -142,19 +142,22 @@ int main(int argc, char * argv[])
             
     }
     
+//    temp = head;
+//    for(lc1 = 0; lc1 < num; lc1++){
+//        bTemp = temp -> node;
+//        for(lc2 = 0; lc2 < num; lc2 ++){
+//            printf("%d ", bTemp -> turns);
+//            //if(bTemp -> next != NULL)
+//            bTemp = bTemp -> next;
+//        }
+//        printf("\n");
+//        temp = temp -> next;
+//    }
     temp = head;
-    for(lc1 = 0; lc1 < num; lc1++){
-        bTemp = temp -> node;
-        for(lc2 = 0; lc2 < num; lc2 ++){
-            printf("%d ", bTemp -> turns);
-            //if(bTemp -> next != NULL)
-            bTemp = bTemp -> next;
-        }
-        printf("\n");
+    while(temp -> next -> next != NULL){
         temp = temp -> next;
     }
-
-    
+    printf("%d\n", temp -> node -> turns);
     fclose(fptr);
     return 0;
 }
