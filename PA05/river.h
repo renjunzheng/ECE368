@@ -9,15 +9,19 @@
 #ifndef hw05_h
 #define hw05_h
 
-typedef struct _vertex{
-    int x; //x coordinate of the vertex
-    int yt; //top coordinate of the vertex
-    int yb; //bottome coordinate of the vertex
-}Vertex;
-
 typedef struct _bridge{
     int index;
     struct _bridge * next;
 }Bridge;
 
+typedef struct _vertex{
+    int index;
+    int x; //x coordinate of the vertex
+    int yt; //top coordinate of the vertex
+    int yb; //bottome coordinate of the vertex
+    struct _vertex *next;
+    Bridge *node;
+}Vertex;
 #endif
+
+Vertex *buildVertex(int row, int column, int poles[row][column], int *index);
