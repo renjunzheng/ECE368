@@ -39,7 +39,6 @@ int main(int argc, char * argv[])
                 poles[lc1][lc2] = 0;
             else if(value == 49)
                 poles[lc1][lc2] = 1;
-            
         }
     }
     
@@ -82,18 +81,6 @@ int main(int argc, char * argv[])
         temp = temp -> next;
     }
     
-//    temp = head;
-//    for(lc1 = 0; lc1 < num; lc1++){
-//        bTemp = temp -> node;
-//        for(lc2 = 0; lc2 < num; lc2 ++){
-//            printf("%d ", bTemp -> turns);
-//            bTemp = bTemp -> next;
-//        }
-//        printf("\n");
-//        temp = temp -> next;
-//    }
-    
-    
     //successfully build the adjacency list, already tested
     
     temp = head;
@@ -104,20 +91,7 @@ int main(int argc, char * argv[])
     }
     temp = head;
     temp -> node -> turns = 0;
-//    temp = head;
-//    for(lc1 = 0; lc1 < num; lc1++){
-//        bTemp = temp -> node;
-//        for(lc2 = 0; lc2 < num; lc2 ++){
-//            printf("%d ", bTemp -> turns);
-//            //if(bTemp -> next != NULL)
-//            bTemp = bTemp -> next;
-//        }
-//        printf("\n");
-//        temp = temp -> next;
-//    }
 
-//    printf("index %d\n", index);
-//    printf("num %d\n", num);
     //Bellman-Ford
     Vertex *secTemp = head;
     int lc3 = 0;
@@ -125,9 +99,6 @@ int main(int argc, char * argv[])
     Bridge *briTemp = NULL;
     for(lc1 = 1; lc1 < num - 1; lc1++){
         briTemp = temp -> node -> next;
-        
-
-        
         for(lc2 = 0; lc2 < num - 2; lc2++){
             secTemp = head;
             for(lc3 = 0; lc3 < briTemp -> index; lc3 ++){
@@ -139,25 +110,30 @@ int main(int argc, char * argv[])
             briTemp = briTemp -> next;
         }
         temp = temp -> next;
-            
     }
-    
-//    temp = head;
-//    for(lc1 = 0; lc1 < num; lc1++){
-//        bTemp = temp -> node;
-//        for(lc2 = 0; lc2 < num; lc2 ++){
-//            printf("%d ", bTemp -> turns);
-//            //if(bTemp -> next != NULL)
-//            bTemp = bTemp -> next;
-//        }
-//        printf("\n");
-//        temp = temp -> next;
-//    }
+
     temp = head;
     while(temp -> next -> next != NULL){
         temp = temp -> next;
     }
     printf("%d\n", temp -> node -> turns);
+    
+    
+    //free the linked list
+    for(lc1 = 0; lc1 < num; lc1++){
+        bTemp = head -> node;
+        for(lc2 = 0; lc2 < num - 1; lc2 ++){
+            Bridge *delete = bTemp -> next;
+            bTemp -> next = delete -> next;
+            if(delete != NULL)
+                free(delete);
+        }
+        free(bTemp);
+        temp = head;
+        head = head -> next;
+        free(temp);
+    }
+    
     fclose(fptr);
     return 0;
 }
@@ -234,8 +210,6 @@ Vertex *buildVertex(int row, int column, int poles[row][column], int *index)
                             head = createVertex(lc2, lc1, *index);
                             *index = *index + 1;
                         }else{
-                        
-                        
                         Vertex *temp = head;
                         while(temp -> next != NULL){
                             temp = temp -> next;
@@ -247,7 +221,6 @@ Vertex *buildVertex(int row, int column, int poles[row][column], int *index)
                             head = createVertex(lc2, lc1, *index);
                             *index = *index + 1;
                         }else{
-                        
                         Vertex *bridge = createVertex(lc2, lc1, *index);
                             *index = *index + 1;
                             
@@ -340,17 +313,3 @@ Bridge *createBridge(int indexnum, int sourcenum, Vertex *head)
     }
     return node;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
